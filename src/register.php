@@ -31,6 +31,25 @@ if(isset($_REQUEST['register_btn'])){
 		$errorMsg[2][] = 'Must be at least 6 characters';
 	}
 	
+	if(empty($errorMsg)){
+
+		$result = mysqli_query($conn, "SELECT name, email FROM users WHERE email='$email'");
+		if($result){
+			$row = mysqli_fetch_assoc($result);
+			if(isset($row['email']) == $email){
+				$errorMsg[1][] = "Email address already exists, please choose another or login instead";
+			}else {
+				$hashed_password = md5($password);
+				$created = new DateTime();
+				$created = $created->format('Y-m-d H:i:s');
+				$sql = "INSERT INTO users (name, email, password, created) VALUES ('$name', '$email', '$hashed_password', '$created')";
+				$result = mysqli_query($conn, $sql);
+				if($result){
+					header("location: index.php?msg=".urlencode('Click the verify button in email'));
+				}
+			}
+		}
+	}
 }
 
 ?>
